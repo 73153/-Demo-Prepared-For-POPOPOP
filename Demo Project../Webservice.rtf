@@ -1,0 +1,87 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1347\cocoasubrtf570
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset134 STHeitiSC-Light;}
+{\colortbl;\red255\green255\blue255;\red100\green56\blue32;\red196\green26\blue22;\red92\green38\blue153;
+\red63\green110\blue116;\red46\green13\blue110;\red170\green13\blue145;\red0\green116\blue0;\red38\green71\blue75;
+\red14\green14\blue255;\red28\green0\blue207;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab770
+\pard\tx770\pardeftab770\pardirnatural
+
+\f0\fs32 \cf2 \CocoaLigature0 #import \cf3 "YearViewController.h"\cf2 \
+#import \cf3 "Utils.h"\cf2 \
+#import \cf3 "SmallMonthCell.h"\cf2 \
+#import \cf3 <ABContactsHelper.h>\cf2 \
+#import \cf3 "MonthViewController.h"\cf2 \
+#import \cf3 "NSDate+FSExtension.h"\cf2 \
+#import \cf3 "KxMenu.h"\cf2 \
+#import \cf3 "InboxMessageViewController.h"\cf2 \
+#import \cf3 "ToDoViewController.h"\cf2 \
+#import \cf3 "NotificationViewController.h"\cf2 \
+#import \cf3 "EventViewController.h"\cf2 \
+#import \cf3 "DayViewController.h"\cf2 \
+#import \cf3 "WebService.h"\cf2 \
+#import \cf3 "AppConstant.h"\cf2 \
+#import \cf3 "UIView+Toast.h"\cf2 \
+#import \cf3 "MBProgressHUD.h"\cf2 \
+#import \cf3 "ContactsViewController.h"\cf2 \
+#import \cf3 "TimelineViewController.h"\cf2 \
+#import \cf3 "NSDate+FSExtension.h"\cf2 \
+#import \cf3 "YearViewController.h"\cf2 \
+#import \cf3 "DateHandler.h"\cf2 \
+#import \cf3 "WeekViewExampleController.h"\cf2 \
+#import \cf3 "AFHTTPRequestOperation.h"\cf2 \
+#import \cf3 "AFHTTPRequestOperationManager.h"\
+\
+\pard\tx770\pardeftab770\pardirnatural
+\cf0  \cf4 NSString\cf0  *userImage = [[\cf5 allRecordArray\cf0  \cf6 objectAtIndex\cf0 :indexPath.\cf4 row\cf0 ] \cf6 valueForKey\cf0 :\cf3 @"image_path"\cf0 ];\
+    \cf7 if\cf0 (![userImage \cf6 isEqualToString\cf0 :\cf3 @""\cf0 ] && ![userImage \cf6 isEqualToString\cf0 :\cf7 nil\cf0 ])\{\
+        \cf8 //        cell.userImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString: userImage]]];\cf0 \
+        [\cf4 UIImage\cf0  \cf9 loadFromURL\cf0 :[\cf4 NSURL\cf0  \cf6 URLWithString\cf0 :userImage] \cf9 callback\cf0 :^(\cf4 UIImage\cf0  *image)\{\
+            cell.\cf5 userImage\cf0 .\cf4 image\cf0  = image;\
+        \}];\
+    \}\
+    \cf7 else\cf0 \
+    \{\
+        [cell.\cf5 userImage\cf0  \cf6 setImage\cf0 :[\cf4 UIImage\cf0  \cf6 imageNamed\cf0 :\cf3 @"user_image_default.png"\cf0 ]];\
+    \}\
+\
+\
+\
+   \
+    \cf5 AFHTTPRequestOperationManager\cf0  *mgr = [\cf5 AFHTTPRequestOperationManager\cf0  \cf9 manager\cf0 ];\
+    \cf8 //    mgr.responseSerializer = [AFJSONResponseSerializer serializer];\cf0 \
+    \
+    \cf8 //    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"{\field{\*\fldinst{HYPERLINK "https://api.weibo.com/oauth2/access_token"}}{\fldrslt \cf10 https://api.weibo.com/oauth2/access_token}}"]];\cf0 \
+    \
+    \cf8 //
+\f1 \cf8 \'c6\'b4\'bd\'d3\'b2\'ce\'ca\'fd
+\f0 \cf0 \
+    \cf4 NSString\cf0  *userid = [[\cf4 NSUserDefaults\cf0  \cf6 standardUserDefaults\cf0 ] \cf6 objectForKey\cf0 :\cf2 kUserId\cf0 ];\
+    \
+    \cf4 NSDictionary\cf0  *dictionary = [\cf4 NSDictionary\cf0  \cf6 dictionaryWithObjectsAndKeys\cf0 :userid,\cf3 @"user_id"\cf0 ,year,\cf3 @"year"\cf0 , \cf7 nil\cf0 ];\
+    \
+    [mgr \cf9 POST\cf0 :\cf3 @"http://dev.planitsyncit.com/app/webservices/webservices_calendar.php?action=getcal_by_date"\cf0  \cf9 parameters\cf0 :dictionary \cf9 success\cf0 :^(\cf5 AFHTTPRequestOperation\cf0  *operation, \cf7 id\cf0  responseObject) \{\
+        \cf4 NSDictionary\cf0  *dictionary = responseObject;\
+        \
+        \cf4 NSDictionary\cf0  *maiDict = [dictionary \cf6 objectForKey\cf0 :\cf3 @"data"\cf0 ];\
+        \
+        \cf4 NSDictionary\cf0  *calendarData = [maiDict \cf6 objectForKey\cf0 :\cf3 @"calendar"\cf0 ];\
+        [\cf5 allRecordArray\cf0  \cf6 removeAllObjects\cf0 ];\
+        [\cf5 allDatesArray\cf0  \cf6 removeAllObjects\cf0 ];\
+        \cf7 if\cf0 (calendarData.\cf4 count\cf0 >\cf11 0\cf0 )\{\
+            \cf5 allDatesArray\cf0  = [[calendarData \cf6 allKeys\cf0 ]\cf6 mutableCopy\cf0 ];\
+            \cf5 allRecordArray\cf0  = [[calendarData \cf6 allValues\cf0 ]\cf6 mutableCopy\cf0 ];\
+            [\cf7 self\cf0  \cf9 loadEvents\cf0 ];\
+            \cf8 //            [self performSelector:@selector(loadEvents) withObject:self afterDelay:0.5];\cf0 \
+        \}\
+    \} \cf9 failure\cf0 :^(\cf5 AFHTTPRequestOperation\cf0  *operation, \cf4 NSError\cf0  *error) \{\
+        \cf6 NSLog\cf0 (\cf3 @"%@"\cf0 ,error);\
+        [\cf7 self\cf0  \cf9 hideProgressHud\cf0 ];\
+        \
+        \cf4 NSHTTPURLResponse\cf0  *response = (\cf4 NSHTTPURLResponse\cf0  *)operation.\cf5 response\cf0 ;\
+        \cf4 NSString\cf0 * ErrorResponse = [[\cf4 NSString\cf0  \cf6 alloc\cf0 ] \cf6 initWithData\cf0 :(\cf4 NSData\cf0  *)error.\cf4 userInfo\cf0 [\cf5 AFNetworkingOperationFailingURLResponseDataErrorKey\cf0 ] \cf6 encoding\cf0 :\cf6 NSUTF8StringEncoding\cf0 ];\
+        \
+        [\cf7 self\cf0 .\cf4 view\cf0  \cf9 makeToast\cf0 :ErrorResponse];\
+        \
+    \}];\
+}
